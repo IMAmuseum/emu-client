@@ -1,0 +1,8 @@
+{
+    "name": "imamuseum/emu-client",
+    "autoload": {
+        "psr-4": {
+            "Imamuseum\\EmuClient\\": "src/"
+        }
+    }
+}
