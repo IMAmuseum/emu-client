@@ -15,9 +15,6 @@ class EmuExport {
     {
         $this->export_path = $config['export_path'];
 
-        $this->makeExportDirectory();
-        $this->deleteJsonFiles();
-
         $session = new \IMuSession($config['host'], $config['port']);
         $session->connect();
 
@@ -25,43 +22,36 @@ class EmuExport {
         $terms = new \IMuTerms();
         $this->count = $this->catalogue->findTerms($terms);
         $this->fields = $config['fields'];
+        $this->catalogue->addFetchSet('exportFields', $this->fields);
 
         $this->start = $config['start'];
         $this->chunk = $config['chunk'];
-
     }
 
-    public function saveJsonFiles()
+    public function saveJsonFile($start, $count)
     {
-        $this->catalogue->addFetchSet('exportFields', $this->fields);
-
-        $i = $this->start;
-        $count = 0;
-        $e = $this->start + $this->chunk;
-
-        while ($i <= $this->count) {
-            $result = $this->catalogue->fetch('start', $i, 1, 'exportFields');
-            // check if result has data
-            if (isset($result->rows[0])) {
-                // get irn from result
-                $irn = $result->rows[0]['irn'];
-                $irns[] = $irn;
-                // add data to result
-                $results['data'][$irn] = array(
-                    $result->rows[0],
-                );
-            }
-            $i++;
-
-            if ($i == $e || $i == $this->count) {
-                // var_dump("export-$count.json");
-                file_put_contents($this->export_path . "/export-$count.json", json_encode($results));
-                $results = array();
-                $e = $e + $this->chunk;
-                $count++;
-            }
+        $results = $this->catalogue->fetch('start', $start, $this->chunk, 'exportFields');
+        foreach ($results->rows as $row) {
+            $irn = $row['irn'];
+            $irns[] = $irn;
+            $data['data'][$irn] = [$row];
         }
-        file_put_contents($this->export_path . "/emu-irns.json", json_encode($irns));
+        file_put_contents($this->export_path . "/export-$count.json", json_encode($data));
+        $this->updateIrnFile($irns, $count);
+    }
+
+    public function updateIrnFile($irns, $count)
+    {
+        if ($count == 0) {
+            $new_irns = $irns;
+        }
+
+        if ($count != 0) {
+            $file_irns = json_decode(file_get_contents($this->export_path . "/emu-irns.json"));
+            $new_irns = array_merge($file_irns, $irns);
+        }
+
+        file_put_contents($this->export_path . "/emu-irns.json", json_encode($new_irns));
     }
 
     public function deleteJsonFiles()
@@ -79,5 +69,10 @@ class EmuExport {
         if (!file_exists($this->export_path)) {
             mkdir($this->export_path, 0755, true);
         }
+    }
+
+    public function getObjectCount()
+    {
+        return $this->count;
     }
 }
