@@ -8,9 +8,9 @@ class EmuController {
 
     public function __construct($config)
     {
+        $this->export_path = $config['export_path'];
         $this->irns = $this->setIrns();
         $this->chunk = $config['chunk'];
-        $this->export_path = $config['export_path'];
     }
 
     public function getSpecificObject($irn)

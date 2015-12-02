@@ -31,6 +31,10 @@ class EmuClientServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        if (config('emu-client.routes_enabled')) {
+            include __DIR__.'/Http/routes.php';
+        }
+
         $this->publishes([
             __DIR__.'/../config/emu-client.php' => config_path('emu-client.php'),
         ]);

@@ -18,4 +18,5 @@ return [
         'WorAcmCollectionName'
     ],
     'export_path' => base_path('resources/emu-export'),
+    'routes_enabled' => true,
 ];
