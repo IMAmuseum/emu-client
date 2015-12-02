@@ -28,7 +28,6 @@ class EmuExportCommand extends Command
      */
     public function __construct()
     {
-        $this->emu = new EmuExport(config('emu-client'));
         parent::__construct();
     }
 
@@ -39,16 +38,17 @@ class EmuExportCommand extends Command
      */
     public function handle()
     {
-        $this->emu->makeExportDirectory();
-        $this->emu->deleteJsonFiles();
+        $emu = new EmuExport(config('emu-client'));
+        $emu->makeExportDirectory();
+        $emu->deleteJsonFiles();
 
         $count = 0;
         $chunk = config('emu-client.chunk');
-        $file_count = (int)floor($this->emu->getObjectCount() / $chunk);
+        $file_count = (int)floor($emu->getObjectCount() / $chunk);
         $this->output->progressStart($file_count);
         while ($count <= $file_count) {
             $start = ($count * $chunk) + $chunk;
-            $this->emu->saveJsonFile($start, $count);
+            $emu->saveJsonFile($start, $count);
             $this->output->progressAdvance();
             $count++;
         }
