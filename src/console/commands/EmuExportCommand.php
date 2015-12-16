@@ -12,7 +12,8 @@ class EmuExportCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'emu:export';
+    protected $signature = 'emu:export
+                            {--type=update : Run the inital Emu export the default is update.}';
 
     /**
      * The console command description.
@@ -38,17 +39,19 @@ class EmuExportCommand extends Command
      */
     public function handle()
     {
-        $emu = new EmuExport(config('emu-client'));
+        $sync_type = $this->option('type');
+        $emu = new EmuExport(config('emu-client'), $sync_type);
         $emu->makeExportDirectory();
         $emu->deleteJsonFiles();
 
         $count = 0;
         $chunk = config('emu-client.chunk');
+        $start = config('emu-client.start');
         $file_count = (int)floor($emu->getObjectCount() / $chunk);
         $this->output->progressStart($file_count);
         while ($count <= $file_count) {
-            $start = ($count * $chunk) + $chunk;
             $emu->saveJsonFile($start, $count);
+            $start = ($count * $chunk) + $chunk;
             $this->output->progressAdvance();
             $count++;
         }

@@ -3,6 +3,7 @@
 return [
     'start' => 0,
     'chunk' => 500,
+    'update_since' => 30, // number of days
     'host' => env('EMU_HOST'),
     'port' => env('EMU_PORT'),
     'fields' => [

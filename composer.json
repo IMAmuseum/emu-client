@@ -4,5 +4,8 @@
         "psr-4": {
             "Imamuseum\\EmuClient\\": "src/"
         }
+    },
+    "require": {
+        "nesbot/carbon": "^1.21"
     }
 }
