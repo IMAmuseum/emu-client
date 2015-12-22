@@ -13,7 +13,7 @@ class EmuExportCommand extends Command
      * @var string
      */
     protected $signature = 'emu:export
-                            {--type=update : Run the inital Emu export the default is update.}';
+                            {--type=update : initial or update}';
 
     /**
      * The console command description.

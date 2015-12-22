@@ -39,7 +39,7 @@ class EmuController {
 
     public function setUpdateIrns()
     {
-        return json_decode(file_get_contents(__DIR__ . '/../data/emu-update-irns.json'));
+        return json_decode(file_get_contents($this->export_path . '/emu-update-irns.json'));
     }
 
     public function getImportFileCount()

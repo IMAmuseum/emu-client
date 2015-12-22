@@ -52,7 +52,7 @@ class EmuExport {
         foreach ($results->rows as $row) {
             $irn = $row['irn'];
             $irns[] = $irn;
-            $data['data'][$irn] = [$row];
+            $data['data'][$irn] = $row;
         }
         file_put_contents($this->export_path . "/export-$count.json", json_encode($data));
         $this->updateIrnFile($irns, $count);
