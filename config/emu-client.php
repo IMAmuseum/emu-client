@@ -22,7 +22,7 @@ return [
     // enable Laravel Routes
     'routes_enabled' => true,
     // do transformation of data out of Emu
-    'transform_data' => true,
+    'transform_data' => false,
     // namespace of trandformer class
     'field_transform_class' => null,
     // transforms data within a single field

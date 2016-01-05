@@ -2,24 +2,30 @@
 
 namespace Imamuseum\EmuClient;
 
+use Imamuseum\EmuClient\EmuTransformer;
+
 class EmuController {
 
     protected $config;
 
     public function __construct($config)
     {
+        $this->transform = $config['transform_data'];
+        if($this->transform ) $this->transformer = new EmuTransformer($config);
         $this->export_path = $config['export_path'];
         $this->chunk = $config['chunk'];
     }
 
-    public function getSpecificObject($irn, $type = 'update')
+    public function getSpecificObject($irn, $type='update', $transform=false)
     {
-        $object_ids = $type == 'update' ? $this->getUpdatedObjectIDs() : $this->getAllObjectIDs();
+        $object_ids = ($type == 'update') ? $this->getUpdatedObjectIDs() : $this->getAllObjectIDs();
         $key = array_search($irn, $object_ids);
 
         $file = 'export-' . floor(abs($key / $this->chunk)) . '.json';
-        $export = json_decode(file_get_contents($this->export_path . "/$file"));
-        return $export->data->$irn;
+        $data = file_get_contents($this->export_path . "/$file");
+        $objects = json_decode($data);
+        $object = $transform ? $this->transformer->item($objects->data->$irn) : $objects->data->$irn;
+        return json_encode($object);
     }
 
     public function getAllObjectIDs()

@@ -47,8 +47,8 @@ class EmuExportCommand extends Command
         $count = 0;
         $chunk = config('emu-client.chunk');
         $start = config('emu-client.start');
-        $file_count = (int)floor($emu->getObjectCount() / $chunk) + 1;
-        $this->output->progressStart($file_count);
+        $file_count = (int)floor($emu->getObjectCount() / $chunk);
+        $this->output->progressStart($file_count + 1);
         while ($count <= $file_count) {
             $emu->saveJsonFile($start, $count);
             $start += $chunk;
