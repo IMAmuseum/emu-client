@@ -19,5 +19,16 @@ return [
         'WorAcmCollectionName'
     ],
     'export_path' => base_path('resources/emu-export'),
+    // enable Laravel Routes
     'routes_enabled' => true,
+    // do transformation of data out of Emu
+    'transform_data' => true,
+    // namespace of trandformer class
+    'field_transform_class' => null,
+    // transforms data within a single field
+    'field_transform' => [
+    ],
+    // adds a field based off of data in multiple fields
+    'field_addition' => [
+    ],
 ];

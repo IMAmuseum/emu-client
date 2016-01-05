@@ -8,10 +8,12 @@ require_once \IMu::$lib . '/Module.php';
 require_once \IMu::$lib . '/Terms.php';
 
 use Carbon\Carbon;
+use Imamuseum\EmuClient\EmuTransformer;
 
 class EmuExport {
 
     protected $config;
+    protected $type;
 
     public function __construct($config, $type)
     {
@@ -32,6 +34,7 @@ class EmuExport {
 
         $this->start = $config['start'];
         $this->chunk = $config['chunk'];
+        $this->transform = $config['transform_data'];
     }
 
     public function doEmuExport()
@@ -41,21 +44,34 @@ class EmuExport {
         $file_count = (int)floor($this->getObjectCount() / $this->chunk);
         while ($count <= $file_count) {
             $this->saveJsonFile($start, $count);
-            $start = ($count * $this->chunk) + $this->chunk;
+            $start += $this->chunk;
             $count++;
         }
     }
 
     public function saveJsonFile($start, $count)
     {
-        $results = $this->catalogue->fetch('start', $start, $this->chunk, 'exportFields');
+        $results = $this->getEmuResults($start);
+
         foreach ($results->rows as $row) {
-            $irn = $row['irn'];
-            $irns[] = $irn;
-            $data['data'][$irn] = $row;
+                $irn = $row['irn'];
+                $irns[] = $irn;
+            if (json_encode($row)) {
+                $data['data'][$irn] = $row;
+            } else {
+                $data['data'][$irn] = 'error';
+                $error = $this->checkJsonEncodeError();
+                $data['data'][$irn] = ['error' => $error];
+            }
         }
         file_put_contents($this->export_path . "/export-$count.json", json_encode($data));
         $this->updateIrnFile($irns, $count);
+    }
+
+    public function getEmuResults($start)
+    {
+        $results = $this->catalogue->fetch('start', $start, $this->chunk, 'exportFields');
+        return $results;
     }
 
     public function updateIrnFile($irns, $count)
@@ -78,7 +94,7 @@ class EmuExport {
         $catalogue = new \IMuModule('ecatalogue', $this->session);
         $catalogue_terms = new \IMuTerms();
         $catalogue->findTerms($catalogue_terms);
-        $results = $catalogue->fetch('start', 0, -1, array('irn'));
+        $results = $catalogue->fetch('start', 0, -1, ['irn']);
         foreach ($results->rows as $row) {
             $irn = $row['irn'];
             $irns[] = $irn;
@@ -105,7 +121,7 @@ class EmuExport {
 
     public function getObjectCount()
     {
-        return $this->count;
+        return $this->count - $this->start;
     }
 
     public function setUpdateTimestamp($since)
@@ -116,5 +132,33 @@ class EmuExport {
     public function getUpdateTimestamp()
     {
         return $this->update_since;
+    }
+
+    public function checkJsonEncodeError()
+    {
+        switch (json_last_error()) {
+            case JSON_ERROR_NONE:
+                $error = "No errors";
+                break;
+            case JSON_ERROR_DEPTH:
+                $error = "Maximum stack depth exceeded";
+                break;
+            case JSON_ERROR_STATE_MISMATCH:
+                $error = "Underflow or the modes mismatch";
+                break;
+            case JSON_ERROR_CTRL_CHAR:
+                $error = "Unexpected control character found";
+                break;
+            case JSON_ERROR_SYNTAX:
+                $error = "Syntax error, malformed JSON";
+                break;
+            case JSON_ERROR_UTF8:
+                $error = "Malformed UTF-8 characters, possibly incorrectly encoded";
+                break;
+            default:
+                $error = "Unknown error";
+            break;
+        }
+        return $error;
     }
 }

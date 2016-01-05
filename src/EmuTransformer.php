@@ -1,16 +1,18 @@
 <?php
 
-namespace Imamuseum\PictionClient;
+namespace Imamuseum\EmuClient;
 
 use Exception;
 
-class PictionTransformer
+class EmuTransformer
 {
     protected $config;
 
     public function __construct($config)
     {
-        $this->config = $config;
+        $this->field_transform = $config['field_transform'];
+        $this->field_addition = $config['field_addition'];
+        $this->field_transform_class = new $config['field_transform_class'];
     }
 
     public function transform($data, $images)
