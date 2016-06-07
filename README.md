@@ -3,18 +3,8 @@
 This package will work independently of the Laravel Framework.
 
 ### Composer Setup
-```json
-{
-    "require": {
-        "imamuseum/emu-client": "dev-master@dev"
-    },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://bitbucket.org/imalab/emu-client.git"
-        }
-    ]
-}
+```sh
+composer require imamuseum/emu-client
 ```
 
 ### Basic Usage
