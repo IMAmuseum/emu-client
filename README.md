@@ -1,5 +1,7 @@
 ## Emu Client
 
+Works with the IMu API for PHP v2.0 - http://imu.mel.kesoftware.com/doc/api/php/index.html
+
 This package will work independently of the Laravel Framework.
 
 ### Composer Setup
