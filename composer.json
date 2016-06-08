@@ -1,5 +1,14 @@
 {
     "name": "imamuseum/emu-client",
+    "description": "Export data from EMu Collection Management System via the IMu API.",
+    "license": "MIT",
+    "authors" : [
+        {
+            "name": "IMA Lab",
+            "email": "imalab@imamuseum.org",
+            "homepage": "http://lab.imamuseum.org"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Imamuseum\\EmuClient\\": "src/"
